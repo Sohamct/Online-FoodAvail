@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <h1 class="text-center">Welcome to our FoodAvail website. </h1>
+    <hr>
+    <div class="row mt-2 g-4">
+        <div class="col-md-3">
+            <div class="card p-1">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Fresh</span> <span>Food</span> </div>
+                    <div> <img src="media/products/20.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Candy</span> </div>
+                    <div> <img src="media/products/21.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Bakery</span> <span>Bread</span> </div>
+                    <div> <img src="media/products/22.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Dairy</span> <span>Product</span> </div>
+                    <div> <img src="media/products/23.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2tr5">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"><span>Snacks</span> </div>
+                    <div> <img src="media/products/24.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Beveragers</span> </div>
+                    <div> <img src="media/products/25.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Frozen</span> </div>
+                    <div> <img src="media/products/26.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-2">
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <div class="flex-column lh-1 imagename"> <span>Alcohol</span> </div>
+                    <div> <img src="media/products/27.jpg" height="100" width="100" /> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        {% for p in product_list %}
+
+            {% if -1 < 0 %}
+                <div class="col-md-3 card">
+                    <div class="m-4">
+                        <h4><a href="{% url 'ecomapp:productdetail' p.slug %}">{{p.title}}</a></h4>
+                        <img src="{{p.image.url}}" alt="" class="img-fluid" style="height: 200px; object-fit: contain;">
+                        <p class="mt-3">Price: <strike>Rs. {{p.marked_price}}</strike> Rs. {{p.selling_price}}</p>
+                        <p class="mt-3 h6">BBD: {{p.exp_date}}</p>
+                        <span><b>Due:</b> {{ p.due|timeuntil }}</span><br>
+                        <a href="{% url 'ecomapp:addtocart' p.id %}" class="btn btn-primary">Add To Cart</a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="my-5">
+            <nav aria-label="...">
+        <ul class="pagination">
+            {% if product_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ product_list.previous_page_number }}">Previous</a>
+              </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for i in product_list.paginator.page_range %}
+            {% if i == product_list.number %}
+            <li class="page-item active"><a class="page-link">{{i}}</a></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if product_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ product_list.next_page_number }}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+      </nav>
+        </div>
+    </div>
+
+</div>
+  <div class="container my-5">
+    <div class="row featurette d-flex justify-content-center align-items-center">
+      <div class="col-md-7 order-md-2">
+        <h2 class="featurette-heading fw-normal lh-1">Problem</h2>
+        <p class="lead">When food ends up in the landfill, It gets covered by other garbage and rots in an anaerobic
+          state - meaning it doesn’t get any oxygen while it decomposes. This creates methane gas, which is a leading
+          cause of greenhouse gases that are making a noticeable gaping hole in the ozone layer and significantly
+          contributing to climate change.</p>
+        <p class="lead">now the main concern is this :  According to several types of research, approximately 40 percent of the food prepared at a wedding venue is wasted and thrown away after the wedding ends. India’s estimated 10 million weddings a year contribute to food wastage. </p>
+
+      </div>
+      <div class="col-md-5 img-fluid">
+        <img src="/media/products/190.jpg" alt="" height="250" weight="250">
+      </div>
+    </div>
+    <div class="row featurette d-flex justify-content-center align-items-center my-4">
+      <div class="col-md-7">
+        <h2 class="featurette-heading fw-normal lh-1">Diversion efforts</h2>
+        <p class="lead">These days, many caterers have tie-ups with NGOs. Once the wedding is complete and guests have eaten, NGOs are given a call and they come with their trucks to pick up leftover food which is immediately sent to places where underprivileged or poor community resides. This way, good use of food is assured and food wastage at weddings avoided.
+        </p>
+        <p class="lead">With all their efforts, to make a small change and every small change in this direction give us big result One day</p>
+      </div>
+      <div class="col-md-5 img-fluid d-flex">
+        <img src="/media/products/120.jpg" alt="" height="250" weight="250">
+      </div>
+    </div>
+    <div class="row featurette d-flex justify-content-center align-items-center my-5">
+      <div class="col-md-7 order-md-2">
+        <h2 class="featurette-heading fw-normal lh-1">Our solution</h2>
+        <p class="lead">we are a non-profit organization that collects and distributes food to hunger-relief charities. we act as food storage and distribution depots for smaller front line agencies; and usually do not themselves give out food directly to people struggling with hunger.</p>
+      </div>
+      <div class="col-md-5 img-fluid">
+        <img src="/media/products/100.jpg" alt="" height="250" weight="250">
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid bg-dark" style="color:white">
+    <footer class="py-3 my-4">
+      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+            <li class="nav-item active">
+                <a class="nav-link px-2 text-white" href="{% url 'ecomapp:home' %}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-2 text-white" href="{% url 'ecomapp:allproducts' %}">Categories</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-2 text-white" href="{% url 'ecomapp:mycart' %}">Cart</a>
+            </li>
+      </ul>
+      <p class="text-center text-white">© 2023 FoodAvail, Inc</p>
+    </footer>
+  </div>
+{% endblock %}
