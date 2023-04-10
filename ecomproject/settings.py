@@ -143,3 +143,5 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+KEY = 'rzp_test_L13gSh8hLnMCkM'
+SECRET = 'NadZDi5x3racKAVVZD0yQVSA'
