@@ -5,59 +5,45 @@
 <body>
     <h3>Your order amount is Rs. {{order.total}}</h3>
     
-    <button id="payment-button">Pay with Khalti</button>
+    <button id="rzp-button1">Pay with Razorpay</button>
     <a href="/">Go to Home page</a>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        var config = {
-            // replace the publicKey with yours
-            "publicKey": "test_public_key_dc74e0fd57cb46cd93832aee0a390234",
-            "productIdentity": "order_{{order.id}}",
-            "productName": "order_{{order.id}}",
-            "productUrl": "http://localhost:8000",
-            "paymentPreference": [
-                "MOBILE_BANKING",
-                "KHALTI",
-                "EBANKING",
-                "CONNECT_IPS",
-                "SCT",
-                ],
-            "eventHandler": {
-                onSuccess (payload) {
-                    // hit merchant api for initiating verfication
-                    axios.get("/khalti-verify/", {
-                        params: {
-                            "token": payload.token,
-                            "amount": payload.amount,
-                            "order_id": "{{order.id}}"
-                        }
-                    }).then(function(resp){
-                        if (resp.data.success == true){
-                            alert("Thanks. Payment Completed Successfully")
-                            location.href = "/"
-                        }else{
-                            alert("Sorry. Error occurred")
-                            location.href = "{{request.build_absolute_uri}}"
-                        }
-                    })
-                },
-                onError (error) {
-                    console.log(error);
-                },
-                onClose () {
-                    console.log('widget is closing');
-                }
-            }
-        };
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var amt = {{order.total}} * 100
+var options = {
+    "key": "rzp_test_L13gSh8hLnMCkM", // Enter the Key ID generated from the Dashboard
+    "amount": amt, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "FoodAvail",
+    "description": "Purchases",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature)
+    },
 
-        var checkout = new KhaltiCheckout(config);
-        var btn = document.getElementById("payment-button");
-        btn.onclick = function () {
-            // minimum transaction amount must be 10, i.e 1000 in paisa.
-            checkout.show({amount: {{order.total}}*100});
-        }
-    </script>
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
     <!-- Paste this code anywhere in you body tag -->
 </body>
 </html>
