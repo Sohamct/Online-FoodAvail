@@ -84,7 +84,6 @@ class CartProduct(models.Model):
 
 ORDER_STATUS = (
     ("Order Received", "Order Received"),
-    ("Order Processing", "Order Processing"),
     ("On the way", "On the way"),
     ("Order Completed", "Order Completed"),
     ("Order Canceled", "Order Canceled"),
@@ -92,7 +91,7 @@ ORDER_STATUS = (
 
 METHOD = (
     ("Cash On Delivery", "Cash On Delivery"),
-    ("Online Payment", "Online Payment"),
+    ("Online", "Online"),
 )
 
 
@@ -110,7 +109,8 @@ class Order(models.Model):
     payment_method = models.CharField(
         max_length=20, choices=METHOD, default="Cash On Delivery")
     payment_completed = models.BooleanField(
-        default=False, null=True, blank=True)
+        default=True, null=True, blank=True)
+
 
     def __str__(self):
         return "Order: " + str(self.id)

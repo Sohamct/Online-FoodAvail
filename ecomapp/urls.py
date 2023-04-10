@@ -22,9 +22,6 @@ urlpatterns = [
     path("khalti-request/", KhaltiRequestView.as_view(), name="khaltirequest"),
     path("khalti-verify/", KhaltiVerifyView.as_view(), name="khaltiverify"),
 
-    path("esewa-request/", EsewaRequestView.as_view(), name="esewarequest"),
-    path("esewa-verify/", EsewaVerifyView.as_view(), name="esewaverify"),
-
     path("register/",
          CustomerRegistrationView.as_view(), name="customerregistration"),
 

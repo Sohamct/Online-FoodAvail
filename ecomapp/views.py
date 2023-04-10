@@ -12,6 +12,8 @@ from django.conf import settings
 from django.db.models import Q
 from .models import *
 from .forms import *
+from django.conf import settings
+import razorpay
 
 
 class EcomMixin(object):
@@ -197,10 +199,8 @@ class CheckoutView(EcomMixin, CreateView):
             del self.request.session['cart_id']
             pm = form.cleaned_data.get("payment_method")
             order = form.save()
-            if pm == "Khalti":
+            if pm == "Online":
                 return redirect(reverse("ecomapp:khaltirequest") + "?o_id=" + str(order.id))
-            elif pm == "Esewa":
-                return redirect(reverse("ecomapp:esewarequest") + "?o_id=" + str(order.id))
         else:
             return redirect("ecomapp:home")
         return super().form_valid(form)
@@ -218,73 +218,22 @@ class KhaltiRequestView(View):
 
 class KhaltiVerifyView(View):
     def get(self, request, *args, **kwargs):
-        token = request.GET.get("token")
         amount = request.GET.get("amount")
         o_id = request.GET.get("order_id")
-        print(token, amount, o_id)
-
-        url = "https://khalti.com/api/v2/payment/verify/"
-        payload = {
-            "token": token,
-            "amount": amount
-        }
-        headers = {
-            "Authorization": "Key test_secret_key_f59e8b7d18b4499ca40f68195a846e9b"
-        }
-
         order_obj = Order.objects.get(id=o_id)
+        # print(amount, o_id)
 
-        response = request.post(url, payload, headers=headers)
-        resp_dict = response.json()
-        if resp_dict.get("idx"):
-            success = True
-            order_obj.payment_completed = True
-            order_obj.save()
-        else:
-            success = False
-        data = {
-            "success": success
-        }
-        return JsonResponse(data)
+        client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+        payment = client.order.create({'amount': amount, 'currency': 'INR', 'payment capture': 1})
+
+        context1 = {'order_obj': order_obj, 'payment': payment}
+        order_obj.razor_pay_order_id = payment['id']
+        order_obj.save()
+
+        print("hello world")
+        return render(request, "khaltirequest.html",context1)
 
 
-class EsewaRequestView(View):
-    def get(self, request, *args, **kwargs):
-        o_id = request.GET.get("o_id")
-        order = Order.objects.get(id=o_id)
-        context = {
-            "order": order
-        }
-        return render(request, "esewarequest.html", context)
-
-
-class EsewaVerifyView(View):
-    def get(self, request, *args, **kwargs):
-        import xml.etree.ElementTree as ET
-        oid = request.GET.get("oid")
-        amt = request.GET.get("amt")
-        refId = request.GET.get("refId")
-
-        url = "https://uat.esewa.com.np/epay/transrec"
-        d = {
-            'amt': amt,
-            'scd': 'epay_payment',
-            'rid': refId,
-            'pid': oid,
-        }
-        resp = request.post(url, d)
-        root = ET.fromstring(resp.content)
-        status = root[0].text.strip()
-
-        order_id = oid.split("_")[1]
-        order_obj = Order.objects.get(id=order_id)
-        if status == "Success":
-            order_obj.payment_completed = True
-            order_obj.save()
-            return redirect("/")
-        else:
-
-            return redirect("/esewa-request/?o_id=" + order_id)
 
 
 class CustomerRegistrationView(CreateView):
